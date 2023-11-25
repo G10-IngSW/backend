@@ -1,12 +1,8 @@
 const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
-const ListaSchema = new Schema({
-  titolo: {
-    type: String,
-    required: true,
-  },
-  elementi: {
+const OggettiListeSchema = new Schema({
+  oggetti: {
     type: [String], 
     default: [], 
   },
@@ -16,8 +12,8 @@ const ListaSchema = new Schema({
     required: true,
   },
 }, {
-  collection: 'liste',
+  collection: 'oggettiListe',
   versionKey: false,
 });
 
-module.exports = mongoose.model('Lista', ListaSchema);
+module.exports = mongoose.model('OggettiListe', OggettiListeSchema);
