@@ -1,8 +1,9 @@
 require('dotenv').config();
-const routes_lista = require('./routes/lista.router');
 const express = require('express');
-const mongoose = require('mongoose');
 const cors = require('cors');
+const mongoose = require('mongoose');
+const routes_lista = require('./routes/lista.router');
+const routes_utenti = require('./routes/utenti.router');
 
 const app = express(); 
 app.use(cors()); // permetto che si facciano richieste da qualunque indirizzo
@@ -10,6 +11,7 @@ mongoose.set('strictQuery', false);
 app.use(express.json());
 
 app.use('/liste', routes_lista);
+app.use('/utenti', routes_utenti);
 
 const PORT = process.env.PORT || 3000;
 
