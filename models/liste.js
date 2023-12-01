@@ -15,6 +15,10 @@ const ListaSchema = new Schema({
     ref: 'utenti',   
     required: true,
   },
+  dataUltimaModifica: {
+    type: Date,
+    default: Date.now,
+  }
 }, {
   collection: 'liste',
   versionKey: false,

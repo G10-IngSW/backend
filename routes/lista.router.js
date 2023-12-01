@@ -20,6 +20,10 @@ router.get('/', async (req, res) => {
 router.get('/:idUtente', async (req, res) => {
   const { idUtente } = req.params;
 
+  if (!idUtente.match(/^[0-9a-fA-F]{24}$/)) { // verifico che l'id sia un objectID di mongodb
+    return res.status(400).json({ error: 'ID utente non valido' });
+  }
+
   try {
     const liste = await Lista.find({ idUtente });
     res.json(liste);
@@ -51,10 +55,11 @@ router.post('/', async (req, res) => {
 router.delete('/:idLista', async (req, res) => {
   const { idLista } = req.params;
 
+  if (!idLista.match(/^[0-9a-fA-F]{24}$/)) { // verifico che l'id sia un objectID di mongodb
+    return res.status(400).json({ error: 'ID della lista non valido' });
+  }
+
   try {
-    if (!idLista.match(/^[0-9a-fA-F]{24}$/)) { // verifico che l'id sia un objectID di mongodb
-      return res.status(400).json({ error: 'ID della lista non valido' });
-    }
 
     const listaEliminata = await Lista.findByIdAndDelete(idLista);
 
@@ -72,13 +77,20 @@ router.delete('/:idLista', async (req, res) => {
 // Endpoint per modificare una lista gia creata in precedenza
 router.put('/:idLista', async (req, res) => {
   const { idLista } = req.params;
+  const { titolo, elementi } = req.body;
+  
+  if (!idLista.match(/^[0-9a-fA-F]{24}$/)) { //controllo che l'id sia del tipo objectId di mongodb
+    return res.status(400).json({ error: 'ID della lista non valido' });
+  }
+  if (!titolo) {
+    return res.status(400).json({ error: 'titolo non trovato' });
+  }
+  if (!elementi) {
+    return res.status(400).json({ error: 'elementi della lista non trovati' });
+  }
 
   try {
-    if (!idLista.match(/^[0-9a-fA-F]{24}$/)) { //controllo che l'id sia del tipo objectId di mongodb
-      return res.status(400).json({ error: 'ID della lista non valido' });
-    }
 
-    const { titolo, elementi } = req.body;
     const listaModificata = await Lista.findByIdAndUpdate(idLista, { titolo, elementi }, { new: true });
 
     if (!listaModificata) {
@@ -96,6 +108,10 @@ router.put('/:idLista', async (req, res) => {
 router.get('/oggetti/:idUtente', async (req, res) => {
   const { idUtente } = req.params;
 
+  if (!idUtente.match(/^[0-9a-fA-F]{24}$/)) {
+    return res.status(400).json({ error: 'ID utente non valido' });
+  }
+
   try {
     const oggetti = await OggettiListe.find({ idUtente });
     res.json(oggetti);
@@ -106,29 +122,37 @@ router.get('/oggetti/:idUtente', async (req, res) => {
 });
 
 // Endpoint per aggiungere un oggetto alla lista di oggetti mai inseriti da un determinato utente
+// Se non esiste tale lista, viene creata
+// TODO controllo duplicati
 router.put('/oggetti/:idUtente', async (req, res) => {
+  const { idUtente } = req.params;
+  const { oggetto } = req.body;
+
+  if (!idUtente.match(/^[0-9a-fA-F]{24}$/)) {
+    return res.status(400).json({ error: 'ID utente non valido' });
+  }
+  if (!oggetto || typeof oggetto !== 'string') {
+    return res.status(400).json({ error: 'Oggetto mancante nel body'})
+  }
+
   try {
-    const { idUtente } = req.params;
-    const { oggetto } = req.body;
 
-    if (!idUtente) {
-      return res.status(400).json({ error: 'ID dell utente mancante' });
-    }
-    if (!oggetto) {
-      return res.status(400).json({ error: 'Oggetto mancante nel body'})
-    }
+    let listaOggettiModificata;
 
-    const listaOggettiModificata = await OggettiListe.findOneAndUpdate(
-      { idUtente },
-      { $push: { oggetti: oggetto } },
-      { new: true }
-    );
+    const listaEsistente = await OggettiListe.findOne({ idUtente });
 
-    if (listaOggettiModificata) {
-      res.json(listaOggettiModificata);
+    if (listaEsistente) {
+      listaOggettiModificata = await OggettiListe.findOneAndUpdate(
+        { idUtente },
+        { $push: { oggetti: oggetto } },
+        { new: true }
+      );
     } else {
-      res.status(404).json({ error: 'Nessun documento trovato con l ID utente specificato' });
+      const nuovaLista = new OggettiListe({ idUtente, oggetti: [oggetto] });
+      listaOggettiModificata = await nuovaLista.save();
     }
+
+    res.json(listaOggettiModificata);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: `Errore durante l aggiunta dell oggetto ${oggetto}` });
@@ -137,16 +161,18 @@ router.put('/oggetti/:idUtente', async (req, res) => {
 
 // Endpoint per rimuovere un oggetto dalla lista di oggetti mai inseriti da un determinato utente
 router.put('/oggetti/:idUtente/rimuovi', async (req, res) => {
-  try {
-    const { idUtente } = req.params;
-    const { oggetto } = req.body;
+  
+  const { idUtente } = req.params;
+  const { oggetto } = req.body;
 
-    if (!idUtente) {
-      return res.status(400).json({ error: 'ID dell utente mancante'});
-    }
-    if (!oggetto) {
-      return res.status(400).json({ error: 'Oggetto mancante nel body'});
-    }
+  if (!idUtente.match(/^[0-9a-fA-F]{24}$/)) {
+    return res.status(400).json({ error: 'ID utente non valido' });
+  }
+  if (!oggetto) {
+    return res.status(400).json({ error: 'Oggetto mancante nel body'});
+  }
+
+  try {
 
     const listaOggettiModificata = await OggettiListe.findOneAndUpdate(
       { idUtente },
@@ -162,6 +188,28 @@ router.put('/oggetti/:idUtente/rimuovi', async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: `Errore durante la rimozione dell oggetto ${oggetto}` });
+  }
+});
+
+// TOTEST Endpoint per eliminare la lista di oggetti mai inseriti da un utente
+router.delete("/oggetti/:idUtente/rimuovitutti", async (req, res) => {
+  const { idUtente } = req.params;
+
+  if (!idUtente.match(/^[0-9a-fA-F]{24}$/)) {
+    return res.status(400).json({ error: 'ID utente non valido' });
+  }
+
+  try {
+    const result = await OggettiListe.findByIdAndDelete('specificoID');
+
+    if (result) {
+      res.json({message: 'Eliminazione avvenuta con successo'});
+    } else {
+      res.status(404).json({error: 'lista con ID utente non trovato'})
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Errore durante la rimozione della lista di oggetti' });
   }
 });
 

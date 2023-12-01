@@ -63,6 +63,8 @@ router.post('/registrazione', async (req, res) => {
   }
 });
 
+// Eliminazione account todo
+
 // ---FINE API---
 
 module.exports = router;
