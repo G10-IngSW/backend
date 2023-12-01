@@ -18,7 +18,7 @@ const ListaSchema = new Schema({
   dataUltimaModifica: {
     type: Date,
     default: Date.now,
-  }
+  },
 }, {
   collection: 'liste',
   versionKey: false,

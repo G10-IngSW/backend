@@ -13,7 +13,7 @@ const UtenteSchema = new Schema({
   password: {
     type: String,
     required: true,
-  }
+  },
 }, {
   collection: 'utenti',
   versionKey: false,
