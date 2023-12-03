@@ -5,28 +5,17 @@ const OggettiListe = require('../models/oggettiListe');
 
 router.use(express.json());
 
-// Endpoint per ottenere tutte le liste
-router.get('/', async (req, res) => {
-  try {
-    const liste = await Lista.find();
-    res.json(liste);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Errore durante il recupero di tutte le liste' });
-  }
-});
-
 // Endpoint per ottenere tutte le liste dato un preciso idUtente
-router.get('/:idUtente', async (req, res) => {
-  const { idUtente } = req.params;
+router.get('/', async (req, res) => {
+  const { idUtente } = req.query;
 
-  if (!idUtente.match(/^[0-9a-fA-F]{24}$/)) { // verifico che l'id sia un objectID di mongodb
+  if (!idUtente || !idUtente.match(/^[0-9a-fA-F]{24}$/)) { // verifico che l'id sia un objectID di mongodb
     return res.status(400).json({ error: 'ID utente non valido' });
   }
 
   try {
     const liste = await Lista.find({ idUtente });
-    res.json(liste);
+    res.json({ message: `Liste dell'utente con id ${idUtente}`, liste: liste });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: `Errore durante il recupero delle liste relativa all utente: ${idUtente}` });
@@ -35,16 +24,15 @@ router.get('/:idUtente', async (req, res) => {
 
 // Endpoint per aggiungere una nuova lista. Contenuto preso dal body
 router.post('/', async (req, res) => {
+  if (!req.body || !req.body.titolo || !req.body.elementi || !req.body.idUtente) {
+    return res.status(400).json({ error: 'Nel body mancano i dati oppure sono presenti dati non validi' });
+  }
+  const { titolo, elementi, idUtente } = req.body;
+  
   try {
-    if (!req.body || !req.body.titolo || !req.body.elementi || !req.body.idUtente) {
-      return res.status(400).json({ error: 'Nel body mancano i dati oppure sono presenti dati non validi' });
-    }
-
-    const { titolo, elementi, idUtente } = req.body;
-
     const nuovaLista = new Lista({ titolo, elementi, idUtente });
     const listaSalvata = await nuovaLista.save();
-    res.json(listaSalvata);
+    res.json({ message: 'Lista salvata con successo', lista_salvata: listaSalvata });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Errore durante l aggiunta di una nuova lista' });
@@ -97,7 +85,7 @@ router.put('/:idLista', async (req, res) => {
       return res.status(404).json({ error: 'Lista non trovata' });
     }
 
-    res.json(listaModificata);
+    res.json({ message: 'Lista modificata con successo', lista_modificata: listaModificata });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Errore durante la modifica della lista' });
@@ -114,7 +102,7 @@ router.get('/oggetti/:idUtente', async (req, res) => {
 
   try {
     const oggetti = await OggettiListe.find({ idUtente });
-    res.json(oggetti);
+    res.json({ message: `Oggetti inseriti da ${idUtente}`, oggetti: oggetti });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: `Errore durante il recupero degli oggetti relativi all utente: ${idUtente}` });
@@ -152,7 +140,7 @@ router.put('/oggetti/:idUtente', async (req, res) => {
       listaOggettiModificata = await nuovaLista.save();
     }
 
-    res.json(listaOggettiModificata);
+    res.json({ message: 'Lista modificata con successo', lista_modificata: listaOggettiModificata });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: `Errore durante l aggiunta dell oggetto ${oggetto}` });
@@ -181,7 +169,7 @@ router.put('/oggetti/:idUtente/rimuovi', async (req, res) => {
     );
 
     if (listaOggettiModificata) {
-      res.json(listaOggettiModificata);
+      res.json({ message: 'Elemento eliminato con successo', lista_modificata: listaOggettiModificata });
     } else {
       res.status(404).json({ error: 'Nessun documento trovato con l ID utente specificato' });
     }

@@ -43,7 +43,7 @@ router.post('/registra', async (req, res) => {
   const { nome, email, password } = req.body;
 
   if (!nome || !email || !password) {
-    return res.status(404).json({ error: 'Dati mancanti' });
+    return res.status(400).json({ error: 'Dati mancanti' });
   }
   if (typeof nome !== 'string' || typeof email !== 'string' || typeof password !== 'string') {
     return res.status(400).json({ error: 'I dati non sono di tipo string' });
@@ -52,7 +52,7 @@ router.post('/registra', async (req, res) => {
   try {
     const utenteEsistente = await Utente.findOne({email});
     if (utenteEsistente) {
-      return res.status(400).json({ error: 'Esiste gia un utente registrato con questa email' });
+      return res.status(409).json({ error: 'Esiste gia un utente registrato con questa email' });
     }
 
     const passwordCriptata = await bcrypt.hash(password, 10);
@@ -68,12 +68,13 @@ router.post('/registra', async (req, res) => {
 });
 
 // Eliminazione account 
-router.delete('/elimina', async (req, res) => {
-  const { nome, email, password } = req.body;
-  if (!nome || !email || !password) {
-    return res.status(404).json({ error: 'Dati mancanti' });
+router.delete('/elimina/:email', async (req, res) => {
+  const { email } = req.params;
+
+  if (!email) {
+    return res.status(400).json({ error: 'Dati mancanti' });
   }
-  if (typeof nome !== 'string' || typeof email !== 'string' || typeof password !== 'string') {
+  if (typeof email !== 'string') {
     return res.status(400).json({ error: 'I dati non sono di tipo string' });
   }
 
@@ -82,11 +83,6 @@ router.delete('/elimina', async (req, res) => {
 
     if (!utente) {
       return res.status(404).json({ error: 'Utente non trovato' });
-    }
-
-    const passwordCorretta = await bcrypt.compare(password, utente.password);
-    if (!passwordCorretta) {
-      return res.status(401).json({ error: 'Password errata' });
     }
 
     const eliminato = await Utente.deleteOne({ email });
@@ -104,11 +100,16 @@ router.delete('/elimina', async (req, res) => {
 });
 
 // Modifica account
-router.put('/modifica', async (req, res) => {
+router.put('/modifica/:idUtente', async (req, res) => {
   const { email, nome, nuovaPassword, vecchiaPassword } = req.body;
+  const { idUtente } = req.params;
+
+  if (!idUtente || !idUtente.match(/^[0-9a-fA-F]{24}$/)) {
+    res.status(400).json({ error: 'idUtente non definito o non valido' })
+  }
 
   try {
-    const utente = await Utente.findOne({ email });
+    const utente = await Utente.findById(idUtente);
     if (!utente) {
       return res.status(404).json({ error: 'Utente non trovato' });
     }
