@@ -23,6 +23,7 @@ router.get('/', async (req, res) => {
 });
 
 // Endpoint per aggiungere una nuova lista. Contenuto preso dal body
+// TODO: controllare che esista un utente con id = idUtente
 router.post('/', async (req, res) => {
   if (!req.body || !req.body.titolo || !req.body.elementi || !req.body.idUtente) {
     return res.status(400).json({ error: 'Nel body mancano i dati oppure sono presenti dati non validi' });

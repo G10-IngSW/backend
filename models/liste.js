@@ -18,6 +18,7 @@ const ListaSchema = new Schema({
   dataUltimaModifica: {
     type: Date,
     default: Date.now,
+    required: true,
   },
 }, {
   collection: 'liste',

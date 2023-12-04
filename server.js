@@ -4,6 +4,8 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const routes_lista = require('./routes/lista.router');
 const routes_utenti = require('./routes/utenti.router');
+const swaggerUi = require('swagger-ui-express');
+const YAML = require('yamljs');
 
 const app = express(); 
 app.use(cors()); // permetto che si facciano richieste da qualunque indirizzo
@@ -14,6 +16,9 @@ app.use('/liste', routes_lista);
 app.use('/utenti', routes_utenti);
 
 const PORT = process.env.PORT || 3000;
+
+const swaggerDocument = YAML.load('./doc/PricePalDocs.yaml');
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 const connectToDB = async() => {
   try {
