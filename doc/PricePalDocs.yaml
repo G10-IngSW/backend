@@ -109,7 +109,7 @@ paths:
               example:
                 error: 'Errore durante la registrazione'
 
-  /utenti/elimina/{email}:
+  /utenti/elimina/{idUtente}:
     delete:
       summary: Eliminazione dell'account utente
       tags: [utenti]
