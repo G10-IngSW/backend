@@ -68,24 +68,24 @@ router.post('/registra', async (req, res) => {
 });
 
 // Eliminazione account 
-router.delete('/elimina/:email', async (req, res) => {
-  const { email } = req.params;
+router.delete('/elimina/:idUtente', async (req, res) => {
+  const { idUtente } = req.params;
 
-  if (!email) {
+  if (!idUtente) {
     return res.status(400).json({ error: 'Dati mancanti' });
   }
-  if (typeof email !== 'string') {
+  if (typeof idUtente !== 'string' || !idUtente.match(/^[0-9a-fA-F]{24}$/)) {
     return res.status(400).json({ error: 'I dati non sono di tipo string' });
   }
 
   try {
-    const utente = await Utente.findOne({ email });
+    const utente = await Utente.findOne({ idUtente });
 
     if (!utente) {
       return res.status(404).json({ error: 'Utente non trovato' });
     }
 
-    const eliminato = await Utente.deleteOne({ email });
+    const eliminato = await Utente.deleteOne({ idUtente });
 
     if (eliminato) {
       res.json({ message: 'Account eliminato con successo' });
@@ -128,6 +128,10 @@ router.put('/modifica/:idUtente', async (req, res) => {
     if (nuovaPassword) {
       const passwordCriptata = await bcrypt.hash(nuovaPassword, 10);
       utente.password = passwordCriptata;
+    }
+
+    if (email) {
+      utente.email = email;
     }
 
     const utenteModificato = await utente.save();

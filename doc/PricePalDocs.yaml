@@ -114,13 +114,12 @@ paths:
       summary: Eliminazione dell'account utente
       tags: [utenti]
       parameters:
-        - name: email
+        - name: idUtente
           in: path
           required: true
-          description: Indirizzo email dell'utente
+          description: Id utente dell'utente da eliminare
           schema:
             type: string
-            format: email
       responses:
         '200':
           description: Successo
