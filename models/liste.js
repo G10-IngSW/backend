@@ -6,18 +6,18 @@ const ListaSchema = new Schema({
     type: String,
     required: true,
   },
-  elementi: {
+  oggetti: {
     type: [String], 
     default: [], 
   },
-  idUtente: {
+  idAccount: {
     type: Schema.Types.ObjectId,
     ref: 'utenti',   
     required: true,
   },
   dataUltimaModifica: {
     type: Date,
-    default: Date.now,
+    default: Date.now(), // PRIMA ERA default: Date.now e funzionava
     required: true,
   },
 }, {

@@ -1,7 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const router = express.Router();
-const Utente = require('../models/utente');
+const Account = require('../models/account');
 
 router.use(express.json());
 
@@ -21,17 +21,17 @@ router.post('/login', async (req, res) => {
 
   try {
     
-    const utente = await Utente.findOne({email});
-    if(!utente){
-      return res.status(404).json({error: `Nessun utente associato alla mail: ${email}`});
+    const account = await Account.findOne({email});
+    if(!account){
+      return res.status(404).json({error: `Nessun account associato alla mail: ${email}`});
     }
 
-    const passwordCorretta = await bcrypt.compare(password, utente.password);
+    const passwordCorretta = await bcrypt.compare(password, account.password);
     if (!passwordCorretta) {
       return res.status(401).json({ error: 'Password errata' });
     }
 
-    res.json({ message: 'Login effettuato con successo', utente });
+    res.json({ message: 'Login effettuato con successo', account });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Errore durante il login' });
@@ -50,17 +50,17 @@ router.post('/registra', async (req, res) => {
   }
 
   try {
-    const utenteEsistente = await Utente.findOne({email});
-    if (utenteEsistente) {
-      return res.status(409).json({ error: 'Esiste gia un utente registrato con questa email' });
+    const accountEsistente = await Account.findOne({email});
+    if (accountEsistente) {
+      return res.status(409).json({ error: 'Esiste gia un account registrato con questa email' });
     }
 
     const passwordCriptata = await bcrypt.hash(password, 10);
 
-    const nuovoUtente = new Utente({ nome, email, password: passwordCriptata });
+    const nuovoAccount = new Account({ nome, email, password: passwordCriptata });
     
-    const utenteSalvato = await nuovoUtente.save();
-    res.json({ message: 'Utente registrato con successo', utente: utenteSalvato });
+    const accountSalvato = await nuovoAccount.save();
+    res.json({ message: 'Account registrato con successo', account: accountSalvato });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Errore durante la registrazione' }); 
@@ -68,24 +68,24 @@ router.post('/registra', async (req, res) => {
 });
 
 // Eliminazione account 
-router.delete('/elimina/:idUtente', async (req, res) => {
-  const { idUtente } = req.params;
+router.delete('/elimina/:idAccount', async (req, res) => {
+  const { idAccount } = req.params;
 
-  if (!idUtente) {
+  if (!idAccount) {
     return res.status(400).json({ error: 'Dati mancanti' });
   }
-  if (typeof idUtente !== 'string' || !idUtente.match(/^[0-9a-fA-F]{24}$/)) {
+  if (typeof idAccount !== 'string' || !idAccount.match(/^[0-9a-fA-F]{24}$/)) {
     return res.status(400).json({ error: 'I dati non sono di tipo string' });
   }
 
   try {
-    const utente = await Utente.findOne({ idUtente });
+    const account = await Account.findById(idAccount);
 
-    if (!utente) {
-      return res.status(404).json({ error: 'Utente non trovato' });
+    if (!account) {
+      return res.status(404).json({ error: 'Account non trovato' });
     }
 
-    const eliminato = await Utente.deleteOne({ idUtente });
+    const eliminato = await Account.findByIdAndDelete(idAccount);
 
     if (eliminato) {
       res.json({ message: 'Account eliminato con successo' });
@@ -100,43 +100,46 @@ router.delete('/elimina/:idUtente', async (req, res) => {
 });
 
 // Modifica account
-router.put('/modifica/:idUtente', async (req, res) => {
+router.put('/modifica/:idAccount', async (req, res) => {
   const { email, nome, nuovaPassword, vecchiaPassword } = req.body;
-  const { idUtente } = req.params;
+  const { idAccount } = req.params;
 
-  if (!idUtente || !idUtente.match(/^[0-9a-fA-F]{24}$/)) {
-    res.status(400).json({ error: 'idUtente non definito o non valido' })
+  if (!idAccount || !idAccount.match(/^[0-9a-fA-F]{24}$/)) {
+    return res.status(400).json({ error: 'idAccount non definito o non valido' })
   }
 
   try {
-    const utente = await Utente.findById(idUtente);
-    if (!utente) {
-      return res.status(404).json({ error: 'Utente non trovato' });
+    const account = await Account.findById(idAccount);
+    if (!account) {
+      return res.status(404).json({ error: 'Account non trovato' });
     }
 
-    if (vecchiaPassword) {
-      const passwordCorretta = await bcrypt.compare(vecchiaPassword, utente.password);
+    if (!vecchiaPassword) {
+      return res.status(401).json({ error: 'Password mancante'});
+    }
+    if (vecchiaPassword) { 
+      const passwordCorretta = await bcrypt.compare(vecchiaPassword, account.password);
       if (!passwordCorretta) {
         return res.status(401).json({ error: 'Vecchia password non corretta' });
       }
     }
 
     if (nome) {
-      utente.nome = nome;
+      account.nome = nome;
     }
 
     if (nuovaPassword) {
       const passwordCriptata = await bcrypt.hash(nuovaPassword, 10);
-      utente.password = passwordCriptata;
+      account.password = passwordCriptata;
     }
 
     if (email) {
-      utente.email = email;
+      account.email = email;
     }
 
-    const utenteModificato = await utente.save();
+    const accountModificato = await account.save();
 
-    res.json({ message: 'Account modificato con successo', utente: utenteModificato });
+    res.json({ message: 'Account modificato con successo', account: accountModificato });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Errore durante la modifica dell account' });

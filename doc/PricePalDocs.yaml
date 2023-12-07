@@ -12,15 +12,17 @@ info:
     Troverai qui una descrizione dettagliata di ciascun endpoint, dei parametri richiesti e delle varie risposte possibili.
 
 tags:
-  - name: utenti
-    description: Operazioni sugli utenti
+  - name: account
+    description: Operazioni sugli account
   - name: liste
     description: Operazioni sulle liste
+  - name: oggetti
+    description: Operazioni sugli oggetti mai inseriti dall'utente
 paths:
-  /utenti/login:
+  /account/login:
     post:
-      summary: Autenticazione dell'utente
-      tags: [utenti]
+      summary: Autenticazione
+      tags: [account]
       requestBody:
         required: true
         content:
@@ -31,11 +33,11 @@ paths:
                 email:
                   type: string
                   format: email
-                  description: Indirizzo email dell'utente
+                  description: Indirizzo email dell'account
                   example: example.name@gmail.com
                 password:
                   type: string
-                  description: Password dell'utente
+                  description: Password dell'account
                   example: password
       responses:
         '200':
@@ -44,8 +46,8 @@ paths:
             application/json:
               example:
                 message: 'Login effettuato con successo'
-                utente:
-                  $ref: '#/components/schemas/Utente'
+                account:
+                  $ref: '#/components/schemas/Account'
         '400':
           description: Dati mancanti o non validi
           content:
@@ -59,11 +61,11 @@ paths:
               example:
                 error: 'Password errata'
         '404':
-          description: Utente non trovato
+          description: Account non trovato
           content:
             application/json:
               example:
-                error: 'Nessun utente associato alla mail: email@example.com'
+                error: 'Nessun account associato alla mail: email@example.com'
         '500':
           description: Errore durante il login
           content:
@@ -71,25 +73,25 @@ paths:
               example:
                 error: 'Errore durante il login'
 
-  /utenti/registra:
+  /account/registra:
     post:
-      summary: Registrazione di un nuovo utente
-      tags: [utenti]
+      summary: Registrazione di un nuovo account
+      tags: [account]
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Utente'
+              $ref: '#/components/schemas/Account'
       responses:
         '200':
           description: Successo
           content:
             application/json:
               example:
-                message: 'Utente registrato con successo'
-                utente:
-                  $ref: '#/components/schemas/Utente'
+                message: 'Account registrato con successo'
+                account:
+                  $ref: '#/components/schemas/Account'
         '400':
           description: Dati mancanti o non validi
           content:
@@ -97,11 +99,11 @@ paths:
               example:
                 error: 'Dati mancanti o non validi'
         '409':
-          description: Utente già registrato
+          description: Account già registrato
           content:
             application/json:
               example:
-                error: 'Esiste già un utente registrato con questa email'
+                error: 'Esiste già un account registrato con questa email'
         '500':
           description: Errore durante la registrazione
           content:
@@ -109,15 +111,15 @@ paths:
               example:
                 error: 'Errore durante la registrazione'
 
-  /utenti/elimina/{idUtente}:
+  /account/elimina/{idAccount}:
     delete:
-      summary: Eliminazione dell'account utente
-      tags: [utenti]
+      summary: Eliminazione dell'account
+      tags: [account]
       parameters:
-        - name: idUtente
+        - name: idAccount
           in: path
           required: true
-          description: Id utente dell'utente da eliminare
+          description: Id account dell'account da eliminare
           schema:
             type: string
       responses:
@@ -134,11 +136,11 @@ paths:
               example:
                 error: 'Dati mancanti o non validi'
         '404':
-          description: Utente non trovato
+          description: Account non trovato
           content:
             application/json:
               example:
-                error: 'Utente non trovato'
+                error: 'Account non trovato'
         '500':
           description: Errore durante l'eliminazione dell'account
           content:
@@ -146,15 +148,15 @@ paths:
               example:
                 error: 'Errore durante l eliminazione dell account'
 
-  /utenti/modifica/{idUtente}:
+  /account/modifica/{idAccount}:
       put:
-        summary: Modifica dell'account utente
-        tags: [utenti]
+        summary: Modifica dell'account
+        tags: [account]
         parameters:
-          - name: idUtente
+          - name: idAccount
             in: path
             required: true
-            description: ID dell'utente da modificare
+            description: ID dell'account da modificare
             schema:
               type: string
               example: 656d99094e20e227874eac45
@@ -167,19 +169,19 @@ paths:
                   email:
                     type: string
                     format: email
-                    description: Nuovo indirizzo email dell'utente
+                    description: Nuovo indirizzo email dell'account
                     example: example.name@gmail.com
                   nome:
                     type: string
-                    description: Nuovo nome dell'utente
+                    description: Nuovo nome dell'account
                     example: ExampleName
                   nuovaPassword:
                     type: string
-                    description: Nuova password dell'utente
+                    description: Nuova password dell'account
                     example: password
                   vecchiaPassword:
                     type: string
-                    description: Vecchia password dell'utente
+                    description: Vecchia password dell'account
                     example: password
         responses:
           '200':
@@ -188,14 +190,14 @@ paths:
               application/json:
                 example:
                   message: 'Account modificato con successo'
-                  utente:
-                    $ref: '#/components/schemas/Utente'
+                  account:
+                    $ref: '#/components/schemas/Account'
           '400':
-            description: Id utente errato
+            description: Id account errato
             content:
               application/json:
                 example:
-                  error: 'Id utente non definito o non valido'
+                  error: 'Id account non definito o non valido'
           '401':
             description: Vecchia password errata
             content:
@@ -203,11 +205,11 @@ paths:
                 example:
                   error: 'Vecchia password non corretta'
           '404':
-            description: Utente non trovato
+            description: Account non trovato
             content:
               application/json:
                 example:
-                  error: 'Utente non trovato'
+                  error: 'Account non trovato'
           '500':
             description: Errore durante la modifica dell'account
             content:
@@ -216,40 +218,6 @@ paths:
                   error: 'Errore durante la modifica dell account'
 
   /liste:
-    get:
-      summary: Ottieni tutte le liste di un utente
-      tags: [liste]
-      parameters:
-        - name: idUtente
-          in: query
-          required: true
-          description: ID dell'utente
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Successo
-          content:
-            application/json:
-              example:
-                message: 'Liste dell utente ottenute con successo'
-                liste:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/Lista'
-        '400':
-          description: Dati mancanti o non validi
-          content:
-            application/json:
-              example:
-                error: 'Dati mancanti o non validi'
-        '500':
-          description: Errore durante il recupero delle liste
-          content:
-            application/json:
-              example:
-                error: 'Errore durante il recupero delle liste dell utente'
-
     post:
       summary: Aggiungi una nuova lista
       tags: [liste]
@@ -263,14 +231,14 @@ paths:
                 titolo:
                   type: string
                   description: Titolo della lista
-                elementi:
+                oggetti:
                   type: array
                   items:
                     type: string
-                  description: Elementi della lista
-                idUtente:
+                  description: Oggetti della lista
+                idAccount:
                   type: string
-                  description: ID dell'utente associato alla lista
+                  description: ID dell'account associato alla lista
       responses:
         '200':
           description: Successo
@@ -292,6 +260,48 @@ paths:
             application/json:
               example:
                 error: 'Errore durante l aggiunta della lista'
+  
+  /liste/{idAccount}:
+    get:
+      summary: Ottieni tutte le liste di un account
+      tags: [liste]
+      parameters:
+        - name: idAccount
+          in: path
+          required: true
+          description: ID dell'account
+          schema:
+            type: string
+            example: 656d99094e20e227874eac45
+      responses:
+        '200':
+          description: Successo
+          content:
+            application/json:
+              example:
+                message: 'Liste dell account ottenute con successo'
+                liste:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Lista'
+        '400':
+          description: Dati mancanti o non validi
+          content:
+            application/json:
+              example:
+                error: 'Dati mancanti o non validi'
+        '404':
+          description: Liste non trovate
+          content:
+            application/json:
+              example:
+                error: 'Liste non trovate'
+        '500':
+          description: Errore durante il recupero delle liste
+          content:
+            application/json:
+              example:
+                error: 'Errore durante il recupero delle liste dell account'
 
   /liste/{idLista}:
     delete:
@@ -350,11 +360,11 @@ paths:
                 titolo:
                   type: string
                   description: Nuovo titolo della lista
-                elementi:
+                oggetti:
                   type: array
                   items:
                     type: string
-                  description: Nuovi elementi della lista
+                  description: Nuovi oggetti della lista
       responses:
         '200':
           description: Successo
@@ -383,24 +393,25 @@ paths:
               example:
                 error: 'Errore durante la modifica della lista'
 
-  /liste/oggetti/{idUtente}:
+  /oggetti/{idAccount}:
     get:
-      summary: Ottieni tutti gli oggetti inseriti da un utente
-      tags: [liste]
+      summary: Ottieni tutti gli oggetti inseriti da un account
+      tags: [oggetti]
       parameters:
-        - name: idUtente
+        - name: idAccount
           in: path
           required: true
-          description: ID dell'utente
+          description: ID dell'account
           schema:
             type: string
+            example: 656d99094e20e227874eac45
       responses:
         '200':
           description: Successo
           content:
             application/json:
               example:
-                message: 'Oggetti inseriti dall utente ottenuti con successo'
+                message: 'Oggetti mai inseriti dall account ottenuti con successo'
                 oggetti:
                   type: array
                   items:
@@ -416,18 +427,19 @@ paths:
           content:
             application/json:
               example:
-                error: 'Errore durante il recupero degli oggetti dell utente'
+                error: 'Errore durante il recupero degli oggetti'
 
     put:
-      summary: Aggiungi un nuovo oggetto alla lista dell'utente
-      tags: [liste]
+      summary: Aggiungi un nuovo oggetto alla lista dell'account
+      tags: [oggetti]
       parameters:
-        - name: idUtente
+        - name: idAccount
           in: path
           required: true
-          description: ID dell'utente
+          description: ID dell'account
           schema:
             type: string
+            example: 656d99094e20e227874eac45
       requestBody:
         required: true
         content:
@@ -459,16 +471,52 @@ paths:
             application/json:
               example:
                 error: 'Errore durante l aggiunta dell oggetto alla lista'
-  
-  /liste/oggetti/{idUtente}/rimuovi:
-    put:
-      summary: Rimuovi un oggetto da una lista dell'utente
-      tags: [liste]
+
+    delete:
+      summary: Rimuovi la lista di oggetti mai inseriti da un account
+      tags: [oggetti]
       parameters:
-        - name: idUtente
+        - name: idAccount
           in: path
           required: true
-          description: ID dell'utente
+          description: ID dell'account
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successo
+          content:
+            application/json:
+              example:
+                message: 'Lista di oggetti rimossa con successo'
+        '400':
+          description: Dati mancanti o non validi
+          content:
+            application/json:
+              example:
+                error: 'Dati mancanti o non validi'
+        '404':
+          description: Lista di oggetti non trovata
+          content:
+            application/json:
+              example:
+                error: 'Lista di oggetti non trovata'
+        '500':
+          description: Errore durante la rimozione della lista di oggetti
+          content:
+            application/json:
+              example:
+                error: 'Errore durante la rimozione della lista di oggetti'
+  
+  /oggetti/rimuovi/{idAccount}:
+    put:
+      summary: Rimuovi un oggetto da una lista dell'account
+      tags: [oggetti]
+      parameters:
+        - name: idAccount
+          in: path
+          required: true
+          description: ID dell'account
           schema:
             type: string
       requestBody:
@@ -495,13 +543,13 @@ paths:
           content:
             application/json:
               example:
-                error: 'ID utente non valido'
+                error: 'ID account non valido'
         '404':
-          description: Nessun documento trovato con l'ID utente specificato
+          description: Nessun documento trovato con l'ID account specificato
           content:
             application/json:
               example:
-                error: 'Nessun documento trovato con l ID utente specificato'
+                error: 'Nessun documento trovato con l ID account specificato'
         '500':
           description: Errore durante la rimozione dell'oggetto
           content:
@@ -509,55 +557,24 @@ paths:
               example:
                 error: 'Errore durante la rimozione dell oggetto'
 
-  
-  /liste/oggetti/{idUtente}/rimuovitutti:
-    delete:
-      summary: Rimuovi tutti gli oggetti dalla lista dell'utente
-      tags: [liste]
-      parameters:
-        - name: idUtente
-          in: path
-          required: true
-          description: ID dell'utente
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Successo
-          content:
-            application/json:
-              example:
-                message: 'Tutti gli oggetti rimossi con successo'
-        '400':
-          description: Dati mancanti o non validi
-          content:
-            application/json:
-              example:
-                error: 'Dati mancanti o non validi'
-        '500':
-          description: Errore durante la rimozione di tutti gli oggetti dalla lista
-          content:
-            application/json:
-              example:
-                error: 'Errore durante la rimozione di tutti gli oggetti dalla lista'
-              
+                 
 components:
   schemas:
-    Utente:
+    Account:
       type: object
       properties:
         nome:
           type: string
-          description: Nome dell'utente
+          description: Nome dell'account
           example: ExampleName
         email:
           type: string
           format: email
-          description: Indirizzo email dell'utente
+          description: Indirizzo email dell'account
           example: example.name@gmail.com
         password:
           type: string
-          description: Password dell'utente
+          description: Password dell'account
           example: password
 
     Lista:
@@ -567,19 +584,19 @@ components:
           type: string
           description: Titolo della lista
           example: titolo
-        elementi:
+        oggetti:
           type: array
           items:
             type: string
-          description: Elementi della lista
+          description: Oggetti della lista
           example:
-            - Primo elemento
-            - Secondo elemento
-            - Terzo elemento
-        idUtente:
+            - Primo oggetto
+            - Secondo oggetto
+            - Terzo oggetto
+        idAccount:
           type: string
-          description: ID dell'utente associato alla lista
-          example: idUtenteValido
+          description: ID dell'account associato alla lista
+          example: idAccountValido
         dataUltimaModifica:
           type: string
           format: date-time
@@ -595,7 +612,7 @@ components:
             type: string
           description: Lista di oggetti
           example: ["Oggetto1", "Oggetto2", "Oggetto3"]
-        idUtente:
+        idAccount:
           type: string
-          description: ID dell'utente associato alla lista di oggetti
-          example: idUtenteValido
+          description: ID dell'account associato alla lista di oggetti
+          example: idAccountValido

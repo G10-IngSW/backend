@@ -6,7 +6,7 @@ const OggettiListeSchema = new Schema({
     type: [String], 
     default: [], 
   },
-  idUtente: {
+  idAccount: {
     type: Schema.Types.ObjectId,
     ref: 'utenti',   
     required: true,
