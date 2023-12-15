@@ -2,6 +2,8 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const router = express.Router();
 const Account = require('../models/account');
+const Lista = require('../models/liste');
+const OggettiListe = require('../models/oggettiListe');
 
 router.use(express.json());
 
@@ -79,20 +81,18 @@ router.delete('/elimina/:idAccount', async (req, res) => {
   }
 
   try {
-    const account = await Account.findById(idAccount);
 
-    if (!account) {
+    const eliminatoAccount = await Account.findByIdAndDelete(idAccount);
+
+    if (!eliminatoAccount) {
       return res.status(404).json({ error: 'Account non trovato' });
     }
 
-    const eliminato = await Account.findByIdAndDelete(idAccount);
+    await Lista.deleteMany({ idAccount });
 
-    if (eliminato) {
-      res.json({ message: 'Account eliminato con successo' });
-    } else {
-      res.status(500).json({ error: 'Errore durante l eliminazione dell account' });
-    }
+    await OggettiListe.deleteMany({ idAccount });
 
+    res.json({ message: 'Account e relative liste eliminate con successo' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Errore durante l eliminazione dell account' });

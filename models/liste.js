@@ -17,7 +17,7 @@ const ListaSchema = new Schema({
   },
   dataUltimaModifica: {
     type: Date,
-    default: Date.now(), // PRIMA ERA default: Date.now e funzionava
+    default: Date.now,
     required: true,
   },
 }, {
