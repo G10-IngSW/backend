@@ -73,9 +73,6 @@ router.post('/registra', async (req, res) => {
 router.delete('/elimina/:idAccount', async (req, res) => {
   const { idAccount } = req.params;
 
-  if (!idAccount) {
-    return res.status(400).json({ error: 'Dati mancanti' });
-  }
   if (typeof idAccount !== 'string' || !idAccount.match(/^[0-9a-fA-F]{24}$/)) {
     return res.status(400).json({ error: 'I dati non sono di tipo string' });
   }
@@ -138,7 +135,6 @@ router.put('/modifica/:idAccount', async (req, res) => {
     }
 
     const accountModificato = await account.save();
-
     res.json({ message: 'Account modificato con successo', account: accountModificato });
   } catch (error) {
     console.error(error);
