@@ -6,10 +6,10 @@ Questa è una breve descrizione del progetto.
 
 Il nostro server Node.js è attualmente hostato su Cyclic (https://www.cyclic.sh/) e può essere accessibile al seguente link:
 
-[https://fuzzy-erin-drawers.cyclic.app](https://fuzzy-erin-drawers.cyclic.app)
+link da mettere
 
 Per visualizzare la documentazione di tutte le api, visualizzare la documentazione swagger cliccando sul seguente link:
-[https://fuzzy-erin-drawers.cyclic.app/api-docs](https://fuzzy-erin-drawers.cyclic.app/api-docs)
+link da mettere
 
 ## Come Eseguire il Progetto Localmente
 
