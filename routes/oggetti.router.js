@@ -23,7 +23,6 @@ router.get('/:idAccount', async (req, res) => {
 
 // Endpoint per aggiungere un oggetto alla lista di oggetti mai inseriti da un determinato account
 // Se non esiste tale lista, viene creata
-// TOTEST
 router.put('/:idAccount', async (req, res) => {
   const { idAccount } = req.params;
   const { oggetto } = req.body;
