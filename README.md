@@ -16,10 +16,10 @@ Per eseguire il progetto localmente, segui questi passaggi:
 
 1. Clona la repository
 2. Installa le dipendenze:
-  cd backend 
-  npm install
+  cd backend  
+  npm install  
 4. crea il file .env con le variabili specificate nel documento D4 sezione deployment
 5. Esegui il server:
-  npm start
-  oppure
-  node server.js
+  npm start  
+  oppure  
+  node server.js  
