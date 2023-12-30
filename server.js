@@ -8,18 +8,18 @@ const routes_oggetti = require('./routes/oggetti.router');
 const swaggerUi = require('swagger-ui-express');
 const YAML = require('yamljs');
 
-const app = express(); 
-app.use(cors()); // permetto che si facciano richieste da qualunque indirizzo
+const app = express();
+app.use(cors()); 
 mongoose.set('strictQuery', false);
-app.use(express.json());
 
+app.use(express.json());
 app.use('/liste', routes_lista);
 app.use('/account', routes_account);
 app.use('/oggetti', routes_oggetti)
 
 const PORT = process.env.PORT || 3000;
-
 const swaggerDocument = YAML.load('./doc/PricePalDocs.yaml');
+
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 const connectToDB = async() => {

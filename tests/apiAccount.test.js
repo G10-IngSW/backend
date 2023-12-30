@@ -16,7 +16,6 @@ afterEach(() => {
   jest.restoreAllMocks();
 });
 
-// Test di login
 describe('POST /account/login', () => {
   it('should return 400 if data is missing', async () => {
     const response = await request(app)
