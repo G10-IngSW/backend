@@ -5,7 +5,6 @@ Questa è una breve descrizione del progetto.
 ## Server Node.js su Cyclic
 
 Il nostro server Node.js è attualmente hostato su Cyclic (https://www.cyclic.sh/) e può essere accessibile al seguente link:
-
 [server](https://wild-ray-kimono.cyclic.app)
 
 Per visualizzare la documentazione di tutte le api, visualizzare la documentazione swagger cliccando sul seguente link:
